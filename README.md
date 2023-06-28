@@ -1,4 +1,4 @@
-# Exploring the Cloud of Feature Interaction Scores in a Rashomon Set
+# Neural Network Predictions of MXenes as High-Capacity Energy Storage Materials in a Rashomon set
 
 
 This repository includes the implementation of the paper (https://arxiv.org/abs/2305.10181). The paper emphasizes the importance of investigating feature interactions not just in a single predictive model, but across a range of well-performing models, illustrated below.
