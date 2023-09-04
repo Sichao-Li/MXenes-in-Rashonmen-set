@@ -1,0 +1,7 @@
+2023-07-19 15:32:49,002 INFO FIS_explainer __init__ You can call function explainer.load_results(results_path="") to load trained results if exist
+2023-07-19 15:33:07,954 INFO FIS_explainer rset_explain Start exploring the possible models
+2023-07-19 15:33:07,954 INFO FIS_explainer rset_explain Already exists, skip
+2023-07-19 15:33:07,955 INFO FIS_explainer rset_explain Calculating all main effects of features range(0, 20) for all models in the Rashomon set
+2023-07-19 15:33:07,955 INFO FIS_explainer rset_explain Already exists, skip
+2023-07-19 15:33:07,956 INFO FIS_explainer rset_explain Already exists, skip
+2023-07-19 15:33:07,956 INFO FIS_explainer rset_explain Already exists, skip

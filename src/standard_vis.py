@@ -1,8 +1,6 @@
 #STANDARD PLOTTING FUNCTIONS
 
 import sys
-import ast
-from copy import copy
 import numpy as np
 from numpy import arange
 
@@ -15,23 +13,29 @@ from matplotlib import cm
 from matplotlib import pyplot as plt
 import matplotlib.image as mpimg
 from mpl_toolkits.mplot3d import Axes3D
-
+import matplotlib.colors as mcolors
+import colorsys
 from sklearn.cluster import KMeans
 from sklearn.metrics import confusion_matrix
 from sklearn.utils.multiclass import unique_labels
-
+from copy import copy
+def colors_vis(c, lightness=0.5):
+    default_colors = ["#1E88E5", "#ff0d57", "#13B755", "#7C52FF", "#FFC000", "#00AEEF"]
+    rgb_color = mcolors.hex2color(default_colors[c])
+    # Convert RGB color to HSL color
+    hls_color = colorsys.rgb_to_hls(*rgb_color)
+    # Adjust lightness value
+    hls_color_adjusted = (hls_color[0], lightness, hls_color[2])
+    # Convert HSL color back to RGB color
+    rgb_color_adjusted = colorsys.hls_to_rgb(*hls_color_adjusted)
+    return rgb_color_adjusted
 def funcLinear(x, a, b):
     return a*x + b
 
 def line(x, xpoints, ypoints):    
     return ((ypoints[1] - ypoints[0]) / (xpoints[1] - xpoints[0])) * (x - xpoints[0]) + ypoints[0]
-
+from scipy.optimize import curve_fit
 def plot_gth_pre(Y_label, Y_pre, range_set = True, range_x=[-1.5,3.5], range_y=[-1.5,3.5], tag='Train', mod='model'):
-    from scipy.optimize import curve_fit
-    import numpy as np
-    import matplotlib.pyplot as plt
-    from scipy import stats
-    
     plt.figure(figsize=(6,4))
     pre_Y = Y_pre
     parameter, covariance_matrix = curve_fit(funcLinear, Y_label.astype(float), pre_Y.flatten().astype(float))
@@ -58,13 +62,15 @@ def plot_gth_pre(Y_label, Y_pre, range_set = True, range_x=[-1.5,3.5], range_y=[
                 facecolors='none', 
                 edgecolors='b')
     ax = plt.gca()
-    ax.tick_params(axis = 'both', which = 'major', labelsize = 16)
-    plt.legend(['Best Fit','Perfect Fit', 'Data'], loc='lower right', fontsize=16)
-    plt.xlabel('Standardised True Value', fontsize=16)
-    plt.ylabel('Standardised Predicted Value', fontsize=16)
-    plt.savefig('./fig/'+mod+tag+'.png', bbox_inches='tight', dpi=300)
-
-    plt.show()
+    ax.set_facecolor("white")
+    ax.xaxis.grid(False, color="black", linestyle='--', lw=1, alpha=0.5)
+    ax.yaxis.grid(False, color="black", linestyle='--', lw=1, alpha=0.5)
+    ax.tick_params(axis = 'both', which = 'major', labelsize = 18)
+    plt.legend(['Best Fit','Perfect Fit', 'Data'], loc='lower right', fontsize=18)
+    plt.xlabel('Standardised True Value', fontsize=18)
+    plt.ylabel('Standardised Predicted Value', fontsize=18)
+    plt.savefig(mod+tag+'.png', bbox_inches='tight', dpi=300)
+    # plt.show()
     
 def pred_gtr(X_test, Y_test, model, range_set = True, tag='Train', mod='model',  range_x=[-1.5,3.5], range_y=[-1.5,3.5]):
     from scipy.optimize import curve_fit
@@ -135,51 +141,31 @@ def plot_confusion_matrix_(y_true, y_pred, classes,
     return ax
 
 
-#def plot_embedding(X, label_Y, color_Y, discrete=True, title=None):
-def plot_embedding(X, label_Y, color_Y, discrete=True, title=True):
-    x_min, x_max = np.min(X, 0), np.max(X, 0)
-    X = (X - x_min) / (x_max - x_min)
-
-    plt.figure(figsize=(10,10))
-    plt.grid(b=True)
-
-    if discrete:
-        plt.scatter(X[:, 0], X[:, 1],s = 180, alpha=0.8, edgecolors = 'black', c=color_Y, 
-                    cmap=plt.cm.get_cmap("tab20", len(list(set(color_Y))) ))
-        plt.colorbar( ticks= range(1, len(list(set(color_Y)))+1  )  )
-    else:
-        plt.scatter(X[:, 0], X[:, 1],s = 180, alpha=0.8, edgecolors = 'black', c=color_Y, 
-                    cmap=plt.cm.get_cmap("jet"))
-        plt.colorbar()
-    
-    plt.xlim([-.1,1.1])
-    plt.ylim([-.1,1.1])
-    plt.title(title)
-    plt.axis('off')
-    plt.xticks([]), plt.yticks([])
-
-    
 def plot_feature_importance(ft_set, feature_importance, show_cols = 30):
-
+    colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', 'grey']
     fig = plt.figure(figsize=(12,4))
     w_lr_sort, ft_sorted, sorted_index_pos = return_feature_importance(ft_set, feature_importance, show_cols = show_cols)
     x_val = list(range(len(w_lr_sort)))
     ax = plt.gca()
+    ax.xaxis.grid(False, color ="black", linestyle='--', lw = 1, alpha=0.5)
+    ax.yaxis.grid(False, color ="black", linestyle='--', lw = 1, alpha=0.5)
+    ax.set_facecolor("white")
     ax.tick_params(axis = 'both', which = 'major', labelsize = 16)
     barlist=plt.bar(x_val, w_lr_sort)
     for i in range(9):
         m = sorted_index_pos.index(i)
-        barlist[m].set_color(colors_vis(c=1))
+        barlist[m].set_color(colors[0])
     for i in range(9,11):
         m = sorted_index_pos.index(i)
-        barlist[m].set_color(colors_vis(c=2))
+        barlist[m].set_color(colors[1])
     for i in range(11, 16):
         # print(i)
         m = sorted_index_pos.index(i)
-        barlist[m].set_color(colors_vis(c=4))
+        barlist[m].set_color(colors[2])
     for i in range(16, 20):
         m = sorted_index_pos.index(i)
-        barlist[m].set_color(colors_vis(c=3))
+        barlist[m].set_color(colors[3])
+    # barlist[-1].set_height(31)
     plt.xlabel('Feature', fontsize=16)
     plt.ylabel('Ranking', fontsize=16)
     plt.xticks(x_val, ft_sorted, rotation='vertical')
@@ -187,12 +173,10 @@ def plot_feature_importance(ft_set, feature_importance, show_cols = 30):
     return fig
 
 def return_feature_importance(ft_set, feature_importance, show_cols = 30):
-
     w_lr = copy(np.abs(feature_importance))
     w_lr = 100 * (w_lr / w_lr.max())
     sorted_index_pos = [index for index, num in sorted(enumerate(w_lr), key=lambda x: x[-1],
                    reverse=True)]
-
     ft_sorted = []
     w_lr_sort = []
     for i, idx in enumerate(sorted_index_pos):
@@ -202,8 +186,6 @@ def return_feature_importance(ft_set, feature_importance, show_cols = 30):
         w_lr_sort.append(w_lr[idx])
 
     return w_lr_sort, ft_sorted, sorted_index_pos
-
-
 def plot_learning_curve(estimator, title, X, y, ylim=(0,1), cv=None,n_jobs=None, train_sizes=np.linspace(.1, 1.0, 5)):
     from sklearn.model_selection import learning_curve
     plt.figure()

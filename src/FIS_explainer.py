@@ -77,13 +77,15 @@ class fis_explainer:
         wrapper_for_torch=False,
     ):
         input, output = self.arg_checks(input, output)
+        self.logger = logging.getLogger(__name__)
+
         self.n_ways = n_ways
         # self.model = model
         self.quadrants = {0: [0, 0], 1: [0, 1], 2: [1, 0], 3: [1, 1]}
         self.input = input
         self.output = output
         self.time_str = time.strftime("%Y%m%d-%H%M%S")
-        self.logger = logging.getLogger(__name__)
+        self.logger.info('You can call function explainer.load_results(results_path="") to load trained results if exist')
         if hasattr(input, 'num_features'):
             self.v_list = range(input.num_features)
             self.softmax = True
@@ -133,6 +135,32 @@ class fis_explainer:
             raise ValueError("Either input or output must be defined")
 
         return input, output
+
+    def load_results(self, results_path=OUTPUT_DIR):
+        content_in_results = os.listdir(results_path)
+        analysis_results = {'FIS-in-Rashomon-set': {'saved': False, 'path': '', 'variable_name': 'FIS_in_Rashomon_set'},
+                            'FIS-joint-effect-raw': {'saved': False, 'path': '',
+                                                     'variable_name': 'rset_joint_effect_raw'},
+                            'FIS-main-effect-raw': {'saved': False, 'path': '',
+                                                    'variable_name': 'rset_main_effect_raw'},
+                            'FIS-main-effect-processed': {'saved': False, 'path': '',
+                                                          'variable_name': 'rset_main_effect_processed'},
+                            'Ref-in-Rashomon-set-analysis': {'saved': False, 'path': '',
+                                                             'variable_name': 'ref_analysis'}}
+        if len(content_in_results) == 0:
+            self.logger.info('Nothing in the directory {}'.format(results_path))
+        else:
+            for result in analysis_results:
+                for content in content_in_results:
+                    if result in content:
+                        analysis_results[result]['saved'] = True
+                        result_path = OUTPUT_DIR + '/' + content
+                        analysis_results[result]['path'] = result_path
+                        att_name = analysis_results[result]['variable_name']
+                        setattr(self, att_name, load_json(result_path))
+                        break
+                if not analysis_results[result]['saved']:
+                    self.logger.info('{} is not in {}'.format(result, content_in_results))
 
     def loss_fn(self, loss_fn):
         if loss_fn == 'regression':
@@ -299,22 +327,24 @@ class fis_explainer:
             save_json(OUTPUT_DIR + '/FIS-joint-effect-raw-{}.json'.format(self.time_str), self.rset_joint_effect_raw)
 
         else:
-            self.all_pairs = [tuple(self.FIS_in_Rashomon_set[i]['feature_idx']) for i in self.FIS_in_Rashomon_set]
+            self.all_pairs = self.ref_analysis['important_pairs']
             self.logger.info('Already exists, skip')
 
-        self.fis_in_r = get_fis_in_r(self.all_pairs, np.array(self.rset_joint_effect_raw['joint_effect_all_pair_set']), np.array(self.rset_main_effect_processed['all_main_effects_diff']), self.n_ways, self.quadrants)
-        self.loss_in_r = get_loss_in_r(self.all_pairs, np.array(self.rset_joint_effect_raw['loss_emp_all_pair_set']), self.n_ways, self.quadrants, self.epsilon, self.loss)
-        for idx, fis_each_pair in enumerate(self.fis_in_r):
-            self.FIS_in_Rashomon_set['pair_idx_{}'.format(idx)] = {}
-            self.FIS_in_Rashomon_set['pair_idx_{}'.format(idx)]['feature_idx'] = self.ref_analysis['ref_fis'][idx][0]
-            self.FIS_in_Rashomon_set['pair_idx_{}'.format(idx)]['results'] = {}
-            self.FIS_in_Rashomon_set['pair_idx_{}'.format(idx)]['results']['ref'] = self.ref_analysis['ref_fis'][idx][1]
-            self.FIS_in_Rashomon_set['pair_idx_{}'.format(idx)]['results']['min'] = np.min(fis_each_pair)
-            self.FIS_in_Rashomon_set['pair_idx_{}'.format(idx)]['results']['max'] = np.max(fis_each_pair)
-        self.logger.info('Calculation done')
-        save_json(OUTPUT_DIR+'/FIS-in-Rashomon-set-{}.json'.format(self.time_str), self.FIS_in_Rashomon_set)
-        self.logger.info('Explanation is saved to {}'.format(OUTPUT_DIR+'/FIS-in-Rashomon-set-{}.json').format(self.time_str))
-
+        if self.FIS_in_Rashomon_set == {}:
+            self.fis_in_r = get_fis_in_r(self.all_pairs, np.array(self.rset_joint_effect_raw['joint_effect_all_pair_set']), np.array(self.rset_main_effect_processed['all_main_effects_diff']), self.n_ways, self.quadrants)
+            self.loss_in_r = get_loss_in_r(self.all_pairs, np.array(self.rset_joint_effect_raw['loss_emp_all_pair_set']), self.n_ways, self.quadrants, self.epsilon, self.loss)
+            for idx, fis_each_pair in enumerate(self.fis_in_r):
+                self.FIS_in_Rashomon_set['pair_idx_{}'.format(idx)] = {}
+                self.FIS_in_Rashomon_set['pair_idx_{}'.format(idx)]['feature_idx'] = self.ref_analysis['ref_fis'][idx][0]
+                self.FIS_in_Rashomon_set['pair_idx_{}'.format(idx)]['results'] = {}
+                self.FIS_in_Rashomon_set['pair_idx_{}'.format(idx)]['results']['ref'] = self.ref_analysis['ref_fis'][idx][1]
+                self.FIS_in_Rashomon_set['pair_idx_{}'.format(idx)]['results']['min'] = np.min(fis_each_pair)
+                self.FIS_in_Rashomon_set['pair_idx_{}'.format(idx)]['results']['max'] = np.max(fis_each_pair)
+            self.logger.info('Calculation done')
+            save_json(OUTPUT_DIR+'/FIS-in-Rashomon-set-{}.json'.format(self.time_str), self.FIS_in_Rashomon_set)
+            self.logger.info('Explanation is saved to {}'.format(OUTPUT_DIR+'/FIS-in-Rashomon-set-{}.json').format(self.time_str))
+        else:
+            self.logger.info('Already exists, skip')
     def swarm_plot_FIS(self, interest_of_pairs, vname=None, plot_all=False,
                    threshold=None, boxplot=False, save=False, suffix=None):
         '''
@@ -450,21 +480,24 @@ class fis_explainer:
         ax.tick_params(axis='both', which='major', labelsize=18)
         ax.set_xlabel('Model reliance', fontsize=18)
         ax.set_ylabel('Features', fontsize=18)
-        ax.figure.colorbar(sm, fraction=0.046, pad=0.04)
+        # TODO: change legend font size
+        cbar = ax.figure.colorbar(sm, fraction=0.046, pad=0.04)
+        cbar.ax.tick_params(labelsize=18)
+        cbar.set_label(label='Loss in the Rashomon set', size=18)
         for location in ['left', 'right', 'top', 'bottom']:
             ax.spines[location].set_linewidth(1)
             ax.spines[location].set_color('black')
         if threshold is not None:
             plt.axvline(threshold, color='black')
         if save:
-            plt.savefig(OUTPUT_DIR + '/figs/swarm_plot_{}.png'.format(suffix), bbox_inches='tight')
+            plt.savefig(OUTPUT_DIR + '/swarm_plot_{}.png'.format(suffix), bbox_inches='tight')
         plt.show()
 
-    def halo_plot(self, pair_idx, save=False, path=''):
+    def halo_plot(self, pair_idx, save=False, suffix=''):
         '''
          :param pair_idx: the pair of interest
          :param save: if save the plot
-         :param path: the saving path
+         :param suffix: halo plot feature name
          '''
         fig = plt.figure(figsize=[6,6])
         ax = fig.add_subplot(111)
@@ -489,7 +522,7 @@ class fis_explainer:
                 ax.spines[location].set_linewidth(1)
                 ax.spines[location].set_color('black')
         if save:
-            plt.savefig(path, bbox_inches='tight')
+            plt.savefig(OUTPUT_DIR + '/halo_plot_{}.png'.format(suffix), bbox_inches='tight')
         plt.show()
 
     def halo_plot_3D(self, pair_idx, save=False, path=''):

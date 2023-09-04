@@ -1,0 +1,14 @@
+2023-07-19 15:47:52,122 INFO FIS_explainer __init__ You can call function explainer.load_results(results_path="") to load trained results if exist
+2023-07-19 15:47:55,089 INFO FIS_explainer rset_explain Start exploring the possible models
+2023-07-19 15:47:55,089 INFO FIS_explainer rset_explain Already exists, skip
+2023-07-19 15:47:55,090 INFO FIS_explainer rset_explain Calculating all main effects of features range(0, 20) for all models in the Rashomon set
+2023-07-19 15:47:55,090 INFO FIS_explainer rset_explain Already exists, skip
+2023-07-19 15:47:55,091 INFO FIS_explainer rset_explain Already exists, skip
+2023-07-19 15:47:55,091 INFO FIS_explainer rset_explain Already exists, skip
+2023-07-19 15:51:39,564 INFO FIS_explainer __init__ You can call function explainer.load_results(results_path="") to load trained results if exist
+2023-07-19 15:51:41,063 INFO FIS_explainer rset_explain Start exploring the possible models
+2023-07-19 15:51:41,064 INFO FIS_explainer rset_explain Already exists, skip
+2023-07-19 15:51:41,064 INFO FIS_explainer rset_explain Calculating all main effects of features range(0, 20) for all models in the Rashomon set
+2023-07-19 15:51:41,065 INFO FIS_explainer rset_explain Already exists, skip
+2023-07-19 15:51:41,065 INFO FIS_explainer rset_explain Already exists, skip
+2023-07-19 15:51:41,066 INFO FIS_explainer rset_explain Already exists, skip
