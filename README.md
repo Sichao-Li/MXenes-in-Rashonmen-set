@@ -84,3 +84,7 @@ grs.plots.halo_plot()
 ## Experiments
 
 Code is provided to reproduce the experiments of our paper in [experiments](experiments).
+
+## Citations
+
+coming soon...
