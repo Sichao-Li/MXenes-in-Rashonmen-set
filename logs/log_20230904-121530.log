@@ -1,9 +1,0 @@
-2023-09-04 12:15:30,507 INFO config <module> The output directory is E:\projects\Batteries\MXen-in-Rashomon-set\experiments/../results
- The log directory is E:\projects\Batteries\MXen-in-Rashomon-set\experiments/../logs
-2023-09-04 13:59:49,340 INFO _explainer __init__ You can call function explainer.load_results(results_path="") to load trained results if exist
-2023-09-04 14:00:25,153 INFO _explainer rset_explain Start exploring the possible models
-2023-09-04 14:00:25,153 INFO _explainer rset_explain Already exists, skip
-2023-09-04 14:00:25,154 INFO _explainer rset_explain Calculating all main effects of features range(0, 20) for all models in the Rashomon set
-2023-09-04 14:00:25,154 INFO _explainer rset_explain Already exists, skip
-2023-09-04 14:00:25,155 INFO _explainer rset_explain Already exists, skip
-2023-09-04 14:00:25,155 INFO _explainer rset_explain Already exists, skip
