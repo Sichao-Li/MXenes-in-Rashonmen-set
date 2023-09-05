@@ -1,20 +1,20 @@
-# Neural Network Predictions of MXenes as High-Capacity Energy Storage Materials in a Rashomon set
+# Multi-Target Neural Network Predictions of MXenes as High-Capacity Energy Storage Materials in a Rashomon set
 
 
-This repository includes the implementation of the paper (https://arxiv.org/abs/2305.10181). The paper emphasizes the importance of investigating feature interactions not just in a single predictive model, but across a range of well-performing models, illustrated below.
+This repository includes the implementation of the paper (https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4520129). The paper emphasizes the importance of investigating feature interactions not just in a single predictive model, but across a range of well-performing models, illustrated below.
 
-![FIS in the Rasomon set](./data/FIn_Rset.png)
+![FIS in the Rasomon set](graphic-abstract.png)
 
 ## Summary
 
-The paper introduces a novel approach to understanding feature interactions in machine learning models. The authors argue that the study of feature interactions in a single model can miss complex relationships between features. Thus, they recommend exploring these interactions across a set of similarly accurate models, known as a Rashomon set.
+This paper aim to analyze MXenes through a set of equally good machine learning models and offer a universal feature importance analysis within a Rashomon set.
+The highlights of this paper are:
 
-The main contributions of this paper are:
+1. Neural networks are used for advanced multi-target regression with superior performance and flexibility.
 
-1. Introduction of the Feature Interaction Score (FIS) as a means to quantify the strength of feature interactions within a predictive model.
-2. Proposal of the FIS Cloud (FISC), a collection of FISs across a Rashomon set, to explore how feature interactions contribute to predictions and how these interactions can vary across models.
-3. Presentation of a non-linear example in a multilayer perceptron (MLP) to characterize the Rashomon set and FISC. This includes a search algorithm to explore FIS and to characterize FISC in a Rashomon set along with two novel visualization tools, namely Halo and Swarm plots.
+2. A Rashomon set of accurate models offers more comprehensive universal feature importance.
 
+3. Domain knowledge is integrated to provide target-specific model selection process.
 ----
 
 ## Project structure
@@ -23,23 +23,23 @@ The project is constructed following the below structure:
 project
 │   README.md
 │   requirement.txt    
-│   LICENSE
+│   ...
 └───data
 │   │   data_file.csv
 └───src
-│   │   feature_importance_helper.py
-│   │   feature_interaction_score_utilities.py
-│   │   FIS_explainer.py
-│   │   general_utilities.py
-│   │   Image_wrapper.py
-│   │   visulizer.py
-└───demo
-│   │   toy_example.ipynb
+│   │   find_RF_parames.py
+│   │   standard_vis.py
+│   │   train_nn...py
+│   │   ...
 └───experiments
+│   │   MXen-categorical-descriptor-Rset.ipynb
+│   │   MXen-elemental-descriptor-Rset.ipynb
 │   │   ...
 └───logs
 │   │   ...
 └───results
+│   │   figs
+│   │   models
 │   │   ...
 ───────────
 ```
@@ -58,17 +58,29 @@ types. To implement the experiments in the paper, dependencies in [requirements.
 ```python
 python -r .\requirements
 ```
+### Installment
 
+```
+pip install -i https://test.pypi.org/simple/ generalized-rashomon-set
+```
+### Usage
+```
+import grs
+
+# train a MLP model
+model =  MLPRegressor(hidden_layer_sizes, max_iter=200).fit(X, y)
+
+# explain the model by exploring the Rashomon set
+explainer = grs.explainers.fis_explainer()
+
+# visualize the predictions
+grs.plots.swarm_plot()
+grs.plots.halo_plot()
+```
 ----
-
-## Demo
-
-A toy example shows how halo plot illustrates the effect of feature interaction 
-in [toy-example.ipynb](.\demo\toy_example.ipynb), results are shown below.
-![Toy example](./demo/x1x2_simple.png)
 
 ----
 
 ## Experiments
 
-Code is provided to reproduce the experiments of our paper.
+Code is provided to reproduce the experiments of our paper in [experiments](experiments).
